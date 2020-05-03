@@ -72,6 +72,7 @@ testModules = \
     phylogeny/cactus_phylogenyTest.py \
     pipeline/cactus_evolverTest.py \
     pipeline/cactus_workflowTest.py \
+    pipeline/dbServerTest.py \
     preprocessor/cactus_preprocessorTest.py \
     preprocessor/lastzRepeatMasking/cactus_lastzRepeatMaskTest.py \
     progressive/cactus_progressiveTest.py \
