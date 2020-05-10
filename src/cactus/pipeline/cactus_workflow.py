@@ -171,7 +171,7 @@ class CactusPhasesJob(CactusJob):
         CactusJob.__init__(self, phaseNode=phaseNode, constantsNode=constantsNode, overlarge=False,
                            checkpoint=checkpoint, preemptable=preemptable)
 
-    def makeRecursiveChildJob(self, job, launchSecondaryKtForRecursiveJob=False):
+    def makeRecursiveChildJob(self, job, launchSecondaryDbForRecursiveJob=False):
         newChild = job(phaseNode=extractNode(self.phaseNode),
                        constantsNode=extractNode(self.constantsNode),
                        cactusDiskDatabaseString=self.cactusWorkflowArguments.cactusDiskDatabaseString,
@@ -180,7 +180,7 @@ class CactusPhasesJob(CactusJob):
                        overlarge=True,
                        cactusWorkflowArguments=self.cactusWorkflowArguments)
 
-        if launchSecondaryKtForRecursiveJob and ExperimentWrapper(self.cactusWorkflowArguments.experimentNode).getDbType() == "kyoto_tycoon":
+        if launchSecondaryDbForRecursiveJob and ExperimentWrapper(self.cactusWorkflowArguments.experimentNode).getDbType() in ["kyoto_tycoon", "redis"]:
             cw = ConfigWrapper(self.cactusWorkflowArguments.configNode)
             memory = max(2500000000, self.evaluateResourcePoly([4.10201882, 2.01324291e+08]))
             cpu = cw.getKtserverCpu(default=0.1)
@@ -195,14 +195,14 @@ class CactusPhasesJob(CactusJob):
         return self.addFollowOn(job(cactusWorkflowArguments=self.cactusWorkflowArguments, phaseName=phaseName,
                                     topFlowerName=self.topFlowerName, halID=self.halID, fastaID=self.fastaID)).rv()
 
-    def runPhase(self, recursiveJob, nextPhaseJob, nextPhaseName, doRecursion=True, launchSecondaryKtForRecursiveJob=False):
+    def runPhase(self, recursiveJob, nextPhaseJob, nextPhaseName, doRecursion=True, launchSecondaryDbForRecursiveJob=False):
         """
         Adds a recursive child job and then a follow-on phase job. Returns the result of the follow-on
         phase job.
         """
         logger.info("Starting %s phase job at %s seconds (recursing = %i)" % (self.phaseNode.tag, time.time(), doRecursion))
         if doRecursion:
-            self.makeRecursiveChildJob(recursiveJob, launchSecondaryKtForRecursiveJob)
+            self.makeRecursiveChildJob(recursiveJob, launchSecondaryDbForRecursiveJob)
         return self.makeFollowOnPhaseJob(job=nextPhaseJob, phaseName=nextPhaseName)
 
     def makeFollowOnCheckpointJob(self, checkpointConstructor, phaseName, ktServerDump=None):
@@ -221,7 +221,8 @@ class CactusPhasesJob(CactusJob):
         """
         confXML = ET.fromstring(self.cactusWorkflowArguments.secondaryDatabaseString)
         dbElem = DbElemWrapper(confXML)
-        if dbElem.getDbType() != "kyoto_tycoon":
+        # TODO: It seems that it does nothing for the known databases. Maybe we can remove it.
+        if dbElem.getDbType() not in ["kyoto_tycoon", "redis"]:
             runCactusSecondaryDatabase(self.cactusWorkflowArguments.secondaryDatabaseString, create=True)
 
     def cleanupSecondaryDatabase(self):
@@ -229,7 +230,8 @@ class CactusPhasesJob(CactusJob):
         """
         confXML = ET.fromstring(self.cactusWorkflowArguments.secondaryDatabaseString)
         dbElem = DbElemWrapper(confXML)
-        if dbElem.getDbType() != "kyoto_tycoon":
+        # TODO: It seems that it does nothing for the known databases. Maybe we can remove it.
+        if dbElem.getDbType() not in ["kyoto_tycoon", "redis"]:
             runCactusSecondaryDatabase(self.cactusWorkflowArguments.secondaryDatabaseString, create=False)
 
 class CactusCheckpointJob(CactusPhasesJob):
@@ -269,7 +271,7 @@ class StartPrimaryDB(CactusPhasesJob):
     def run(self, fileStore):
         cw = ConfigWrapper(self.cactusWorkflowArguments.configNode)
 
-        if self.cactusWorkflowArguments.experimentWrapper.getDbType() == "kyoto_tycoon":
+        if self.cactusWorkflowArguments.experimentWrapper.getDbType() in ["kyoto_tycoon", "redis"]:
             memory = max(2500000000, self.evaluateResourcePoly([4.10201882, 2.01324291e+08]))
             cores = cw.getKtserverCpu(default=0.1)
             dbElem = ExperimentWrapper(self.cactusWorkflowArguments.experimentNode)
@@ -1092,7 +1094,7 @@ class CactusReferencePhase(CactusPhasesJob):
         exp = self.cactusWorkflowArguments.experimentWrapper
         return self.runPhase(CactusReferenceRecursion, CactusSetReferenceCoordinatesDownPhase, "reference",
                              doRecursion=exp.isRootReconstructed(),
-                             launchSecondaryKtForRecursiveJob=True)
+                             launchSecondaryDbForRecursiveJob=True)
 
 class CactusReferenceRecursion(CactusRecursionJob):
     """This job creates the wrappers to run the reference problem algorithm, the follow on job then recurses down.
@@ -1277,7 +1279,7 @@ class CactusHalGeneratorPhase2(CactusPhasesJob):
             self.phaseNode.attrib["experimentPath"] = self.cactusWorkflowArguments.experimentFile
             self.phaseNode.attrib["secondaryDatabaseString"] = self.cactusWorkflowArguments.secondaryDatabaseString
             self.phaseNode.attrib["outputFile"] = "1"
-            self.halID = self.makeRecursiveChildJob(CactusHalGeneratorRecursion, launchSecondaryKtForRecursiveJob=True)
+            self.halID = self.makeRecursiveChildJob(CactusHalGeneratorRecursion, launchSecondaryDbForRecursiveJob=True)
 
         return self.makeFollowOnPhaseJob(CactusHalGeneratorPhase3, "hal")
 
