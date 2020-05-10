@@ -359,6 +359,8 @@ def main():
                         "rather than pulling one from quay.io")
     parser.add_argument("--binariesMode", choices=["docker", "local", "singularity"],
                         help="The way to run the Cactus binaries", default=None)
+    parser.add_argument("--database", choices=["kyoto_tycoon", "redis"],
+                        help="The type of database", default="kyoto_tycoon")
 
     options = parser.parse_args()
 
@@ -375,9 +377,6 @@ def main():
             # is there a way to get this out of Toil?  That would be more consistent
             if multiprocessing.cpu_count() < 2:
                 raise RuntimeError('Only 1 CPU detected.  Cactus requires at least 2')
-
-    # tokyo_cabinet is no longer supported
-    options.database = "kyoto_tycoon"
 
     # Mess with some toil options to create useful defaults.
 
