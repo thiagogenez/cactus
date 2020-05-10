@@ -1,6 +1,5 @@
 
-"""
-    Test the database servers using DbService
+"""Tests the database servers using DbServerService
 """
 import unittest
 import os
