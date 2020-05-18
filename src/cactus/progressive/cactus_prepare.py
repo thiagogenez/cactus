@@ -35,9 +35,10 @@ def main():
     parser.add_argument("--halOptions", type=str, default="--hdf5InMemory", help="options for every hal command")
     parser.add_argument("--cactusOptions", type=str, default="--realTimeLogging --logInfo", help="options for every cactus command")
     parser.add_argument("--preprocessOnly", action="store_true", help="only decompose into preprocessor and cactus jobs")
+    parser.add_argument("--database", choices=["kyoto_tycoon", "redis"], help="The type of database", default="kyoto_tycoon")
+
 
     options = parser.parse_args()
-    options.database = 'kyoto_tycoon'
     #todo support root option
     options.root = None
 
@@ -212,10 +213,10 @@ def get_plan(options, project, outSeqFile):
         for event in sorted(group):
             # todo: support cactus interface (it's easy enough here, but cactus_progressive.py needs changes to handle)
             plan += '\n'
-            plan += 'cactus-blast {} {} {} --root {} {}\n'.format(
-                options.jobStore, options.outSeqFile, cigarPath(event), event, options.cactusOptions)
-            plan += 'cactus-align {} {} {} {} --root {} {}\n'.format(
-                options.jobStore, options.outSeqFile, cigarPath(event), halPath(event), event, options.cactusOptions)
+            plan += 'cactus-blast {} {} {} --root {} {} --database {}\n'.format(
+                options.jobStore, options.outSeqFile, cigarPath(event), event, options.cactusOptions, options.database)
+            plan += 'cactus-align {} {} {} {} --root {} {} --database {}\n'.format(
+                options.jobStore, options.outSeqFile, cigarPath(event), halPath(event), event, options.cactusOptions, options.database)
             # todo: just output the fasta in cactus-align.
             plan += 'hal2fasta {} {} {} > {}\n'.format(halPath(event), event, options.halOptions, outSeqFile.pathMap[event])
 

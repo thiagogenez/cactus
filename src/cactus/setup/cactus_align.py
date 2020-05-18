@@ -70,6 +70,8 @@ def main():
                         help="The way to run the Cactus binaries", default=None)
     parser.add_argument("--nonBlastInput", action="store_true",
                         help="Input does not come from cactus-blast: Do not append ids to fasta names")
+    parser.add_argument("--database", choices=["kyoto_tycoon", "redis"],
+                        help="The type of database", default="kyoto_tycoon")
 
     options = parser.parse_args()
 
@@ -77,7 +79,6 @@ def main():
     setLoggingFromOptions(options)
     enableDumpStack()
 
-    options.database = 'kyoto_tycoon'
 
     options.buildHal = True
     options.buildFasta = True

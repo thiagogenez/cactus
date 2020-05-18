@@ -45,10 +45,6 @@ def main():
     parser.add_argument("outputFile", type=str, help = "Output pairwise alignment file")
 
     #Progressive Cactus Options
-    parser.add_argument("--database", dest="database",
-                      help="Database type: tokyo_cabinet or kyoto_tycoon"
-                      " [default: %(default)s]",
-                      default="kyoto_tycoon")
     parser.add_argument("--configFile", dest="configFile",
                         help="Specify cactus configuration file",
                         default=os.path.join(cactusRootPath(), "cactus_progressive_config.xml"))
@@ -66,6 +62,8 @@ def main():
                         "rather than pulling one from quay.io")
     parser.add_argument("--binariesMode", choices=["docker", "local", "singularity"],
                         help="The way to run the Cactus binaries", default=None)
+    parser.add_argument("--database", choices=["kyoto_tycoon", "redis"],
+                        help="The type of database", default="kyoto_tycoon")
 
     options = parser.parse_args()
 
@@ -73,7 +71,6 @@ def main():
     setLoggingFromOptions(options)
     enableDumpStack()
 
-    options.database = 'kyoto_tycoon'
 
     # Mess with some toil options to create useful defaults.
 
