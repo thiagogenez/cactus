@@ -23,7 +23,8 @@ class TestCase(unittest.TestCase):
         """ Run the full evolver test, putting the jobstore and output in tempDir 
         """
         cmd = ['cactus', self._job_store(binariesMode), './examples/evolverMammals.txt', self._out_hal(binariesMode),
-                               '--binariesMode', binariesMode, '--logInfo', '--realTimeLogging', '--workDir', self.tempDir]
+                               '--binariesMode', binariesMode, '--logInfo', '--realTimeLogging', '--workDir', self.tempDir,
+                               '--database', 'redis']
         # todo: it'd be nice to have an interface for setting tag to something not latest or commit
         if binariesMode == 'docker':
             cmd += ['--latest']
@@ -40,7 +41,7 @@ class TestCase(unittest.TestCase):
         out_seqfile = os.path.join(out_dir, 'evolverMammalsOut.txt')
         in_seqfile = './examples/evolverMammals.txt'
         cmd = ['cactus-prepare', in_seqfile, out_dir, out_seqfile, self._out_hal(name),
-               '--jobStore', self._job_store(name)]
+               '--jobStore', self._job_store(name), '--database', 'redis']
 
         job_plan = popenCatch(' '.join(cmd))
 
@@ -67,7 +68,7 @@ class TestCase(unittest.TestCase):
             inseq.write('simRat_chr6 http://s3-us-west-2.amazonaws.com/jcarmstr-misc/testRegions/evolverMammals/simRat.chr6\n')
 
         cmd = ['cactus-prepare', in_seqfile, out_dir, out_seqfile, self._out_hal(binariesMode),
-               '--jobStore', self._job_store(binariesMode)]
+               '--jobStore', self._job_store(binariesMode), '--database', 'redis']
         job_plan = popenCatch(' '.join(cmd))
 
         for line in job_plan.split('\n'):
