@@ -6,7 +6,7 @@ modules = api setup blastLib caf bar blast normalisation hal phylogeny reference
 
 # submodules are in multiple pass to handle dependencies cactus2hal being dependent on
 # both cactus and sonLib
-submodules1 = kyoto sonLib cPecan hal matchingAndOrdering pinchesAndCacti
+submodules1 = redis kyoto sonLib cPecan hal matchingAndOrdering pinchesAndCacti
 submodules2 = cactus2hal
 submodules = ${submodules1} ${submodules2}
 
@@ -146,6 +146,10 @@ clean: selfClean ${submodules:%=subclean.%}
 ##
 suball1: ${submodules1:%=suball.%}
 suball2: ${submodules2:%=suball.%}
+suball.redis:
+	cd submodules/redis && ${MAKE} PREFIX=${CWD}
+	cd submodules/redis && ${MAKE} PREFIX=${CWD} install
+
 suball.kyoto:
 	cd submodules/kyoto && ${MAKE} PREFIX=${CWD}
 	cd submodules/kyoto && ${MAKE} PREFIX=${CWD} install
