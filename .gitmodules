@@ -19,3 +19,7 @@
 [submodule "submodules/kyoto"]
 	path = submodules/kyoto
 	url = https://github.com/ComparativeGenomicsToolkit/kyoto.git
+[submodule "submodules/redis"]
+	path = submodules/redis
+	url = https://github.com/antirez/redis
+	branch = 6.0
