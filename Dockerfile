@@ -27,7 +27,7 @@ RUN mkdir -p /wheels && cd /wheels && python3 -m pip install -U pip && python3 -
 FROM ubuntu:bionic-20200112
 
 # apt dependencies for runtime
-RUN apt-get update && apt-get install -y --no-install-recommends git python3 python3-pip python3-distutils zlib1g libbz2-1.0 net-tools libhdf5-100 liblzo2-2 libtokyocabinet9 libhiredis0.13 redis-server
+RUN apt-get update && apt-get install -y --no-install-recommends git python3 python3-pip python3-distutils zlib1g libbz2-1.0 net-tools libhdf5-100 liblzo2-2 libtokyocabinet9 libhiredis0.13
 
 # copy temporary files for installing cactus
 COPY --from=builder /home/cactus /tmp/cactus
