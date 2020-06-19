@@ -73,7 +73,7 @@ class RedisServer:
 
         return process, self.dbElem, self.logPath
 
-    def blockUntilServerIsRunning(self, createTimeout=60):
+    def blockUntilServerIsRunning(self, createTimeout=1800):
         """Check status until it's successful, an error is found, or we timeout.
 
         Returns True if the redis-server is now running, False if something went wrong."""
