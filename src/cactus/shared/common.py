@@ -1360,8 +1360,8 @@ class RoundedJob(Job):
     thousands of slightly different requirements will slow down the
     leader and the workflow.
     """
-    # Default rounding amount: 100 MiB
-    roundingAmount = 100*1024*1024
+    # Default rounding amount: 500 MiB since 100 MiB was failing the BlastRun
+    roundingAmount = 5 * 100*1024*1024
     def __init__(self, memory=None, cores=None, disk=None, preemptable=None,
                  unitName=None, checkpoint=False):
         if memory is not None:
